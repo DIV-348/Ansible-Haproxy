@@ -1,0 +1,60 @@
+- hosts: LB
+  tasks:
+          - name: "installing httpd"
+            package: 
+                name: "httpd"
+                state: present
+
+          - name: "installing haproxy"
+            package: 
+                name: "haproxy"
+                state: present
+
+          - name: "installing php"
+            package: 
+                name: "php"
+                state: present
+
+          - name: "copying .cfg file"
+            template: 
+                src: "/ansible/task12/haproxy.cfg"
+                dest: "/etc/haproxy/haproxy.cfg"
+
+          - name: "starting haproxy services"
+            service: 
+                name: "haproxy"
+                state: restarted
+
+          - name: "setting the firewall"
+            firewalld:
+                   port: "8080/tcp"
+                   state: enabled
+                   permanent: yes
+                   immediate: yes
+
+
+- hosts: web
+  tasks:
+
+          - name: "installing httpd"
+            package:
+                    name: "httpd"
+                    state: present
+
+          - name: "copying content"
+            copy:
+                    src: "/var/www/html/index.php"
+                    dest: "/var/www/html/index.php"
+
+          - name: "starting httpd service"
+            service:
+                name: "httpd"
+                state: restarted
+                
+          - name: "setting the firewall"
+            firewalld:
+                   port: "80/tcp"
+                   state: enabled
+                   permanent: yes
+                   immediate: yes
+
